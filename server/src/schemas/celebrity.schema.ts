@@ -3,18 +3,18 @@ import { HydratedDocument } from 'mongoose';
 
 export type CelebrityDocument = HydratedDocument<Celebrity>;
 
-// Représente une personnalité sur Twitter
+// Represents a celebrity
 @Schema()
 export class Celebrity {
-  // Identifiant de l'utilisateur
+  // Twitter's id
   @Prop()
   id_twitter: string;
 
-  // Nom d'utilisateur
+  // Username
   @Prop()
   username: string;
 
-  // Catégories dans lesquels l'utilisateur est classé
+  // Categories the celebrity belongs to
   @Prop()
   categories: string[];
 }

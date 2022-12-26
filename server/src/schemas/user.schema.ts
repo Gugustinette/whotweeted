@@ -3,18 +3,18 @@ import { HydratedDocument } from 'mongoose';
 
 export type UserDocument = HydratedDocument<User>;
 
-// Représente un utilisateur
+// Represents a user
 @Schema()
 export class User {
-  // Nom d'utilisateur
+  // Username
   @Prop()
   username: string;
 
-  // URL de la photo de profil de l'utilisateur
+  // Profile picture's url
   @Prop()
   url_pp: string;
 
-  // Nombre de parties gagnées par l'utilisateur
+  // Number of games won
   @Prop()
   nb_won_game: number;
 }

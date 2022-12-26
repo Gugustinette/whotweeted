@@ -6,44 +6,50 @@ import { Round } from './round.schema';
 
 export type RoomDocument = mongoose.HydratedDocument<Room>;
 
-// Représente une partie
+// Represents a room
 @Schema()
 export class Room {
   /**
-   * Attributs
+   * Attributes
    */
-  // Identifiant de l'utilisateur possédant la Room
+  // User's id who created the room
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
   master: User;
 
-  // Identifiant des utilisateurs jouant dans la Room
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
+  // Users who play in the room
+  @Prop({ type: mongoose.Schema.Types.Array, ref: 'User' })
   players: User[];
 
-  // Score des utilisateurs jouant dans la Room
-  @Prop()
+  // Scores of each player
+  @Prop({
+    type: mongoose.Schema.Types.Mixed,
+  })
   scores: Record<string, number>;
 
-  // Round actuel
+  // Round in progress
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Round' })
   actual_round: Round;
 
-  // Rounds
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Round' })
+  // Rounds of the game
+  @Prop({ type: mongoose.Schema.Types.Array, ref: 'Round' })
   rounds: Round[];
 
-  // Identifiants Twitter des personnes avec lesquels on joue
+  // Twitter's id of the users that will be used in the game
   @Prop()
   id_twitter_users: string[];
 
-  // Mode de jeu (Célébrité / Personnalisé)
+  // Game mode (Custom / Celebrity)
   @Prop()
   mode: string;
+
+  // Status of the game 'initialization' / 'in_progress' / 'finished'
+  @Prop()
+  status: string;
 
   /**
    * Configuration
    */
-  // Nombre de rounds
+  // Number of rounds in the game
   nb_max_round: number;
 }
 

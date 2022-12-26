@@ -1,28 +1,28 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
 
-import { User } from './user.schema';
-
 export type RoundDocument = mongoose.HydratedDocument<Round>;
 
-// Représente un round d'une partie
+// Represent a round
 @Schema()
 export class Round {
   /**
    * Attributs
    */
-  // Identifiant du tweet du round
+  // Tweet's id of the round
   @Prop()
   id_tweet: string;
 
-  // Identifiant du compte du tweet du round
+  // Tweet's user's id of the round
   id_twitter_user_response: string;
 
-  // Identifiant des comptes à proposer aux joueurs
+  // Tweet's user's ids to propose to the players
   id_twitter_user_propositions: string[];
 
-  // Réponses des joueurs de la partie
-  @Prop()
+  // Player's responses (id_user => id_twitter_user)
+  @Prop({
+    type: mongoose.Schema.Types.Mixed,
+  })
   player_responses: Record<string, string>;
 }
 
