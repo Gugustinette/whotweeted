@@ -12,12 +12,15 @@ import { UserService } from '../users/user.service';
 import { Room, RoomSchema } from '../schemas/room.schema';
 import { User, UserSchema } from '../schemas/user.schema';
 
+// Gateway
+import { RoomGateway } from './room.gateway';
+
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Room.name, schema: RoomSchema }]),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
   controllers: [RoomController],
-  providers: [RoomService, UserService],
+  providers: [RoomGateway, RoomService, UserService],
 })
 export class RoomModule {}

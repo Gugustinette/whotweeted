@@ -32,6 +32,7 @@ export class RoomController {
     return {
       room_id: room._id,
       user: {
+        _id: user._id,
         username: user.username,
         url_pp: user.url_pp,
       },
