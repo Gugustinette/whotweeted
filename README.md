@@ -1,4 +1,7 @@
-# whotweeted
+# WhoTweeted
+<img src="./ressources/logo.png" width="500" style="display: block; margin: auto;">
+
+## Description
 An online game based on who tweeted a given tweet
 
 ## Installation
