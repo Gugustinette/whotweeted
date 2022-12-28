@@ -30,4 +30,9 @@ export class UserService {
   async findAll(): Promise<User[]> {
     return this.userModel.find().exec();
   }
+
+  // Get a user by its ID
+  async getUserById(user_id: string): Promise<UserDocument> {
+    return this.userModel.findById(user_id).exec();
+  }
 }

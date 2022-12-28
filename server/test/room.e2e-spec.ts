@@ -86,11 +86,21 @@ describe('Rooms', () => {
       });
 
       // Receive the list of players in the room
-      socket.on(RoomGateway.EVENT_PLAYERS_LIST, (data) => {
+      socket.on(RoomGateway.EVENT_ROOM_INFO, (data) => {
         // Check if the response has the correct properties
-        expect(data).toHaveProperty('user_id');
-        expect(data.user_id).toHaveLength(24);
-        expect(data.user_id).toMatch(/^[0-9a-fA-F]{24}$/);
+        expect(data).toHaveProperty('_id');
+        expect(data).toHaveProperty('master');
+        expect(data.master).toHaveProperty('_id');
+        expect(data.master).toHaveProperty('username');
+        expect(data.master).toHaveProperty('url_pp');
+        expect(data.master).toHaveProperty('nb_won_game');
+        expect(data).toHaveProperty('players');
+        expect(data.players).toHaveLength(1);
+        expect(data).toHaveProperty('scores');
+        expect(data).toHaveProperty('mode');
+        expect(data.mode).toEqual('custom');
+        expect(data).toHaveProperty('status');
+        expect(data.status).toEqual('initialization');
         // Disconnect the socket
         socket.disconnect();
       });

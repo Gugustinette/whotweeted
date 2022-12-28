@@ -1,4 +1,4 @@
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
@@ -26,7 +26,7 @@ export class RoomService {
   createDefaultRoom(user: UserDocument): Promise<RoomDocument> {
     const createdRoom = new this.roomModel({
       master: user,
-      players: [user._id],
+      players: [user],
       // Score is a record of the score of each player
       scores: {
         [String(user._id)]: 0,
@@ -39,5 +39,37 @@ export class RoomService {
       nb_max_round: 5,
     });
     return createdRoom.save();
+  }
+
+  // Get a room by its ID
+  getRoomById(room_id: string): Promise<RoomDocument> {
+    return this.roomModel.findById(room_id).exec();
+  }
+  getRoomPopulatedById(room_id: string): Promise<RoomDocument> {
+    return this.roomModel
+      .findById(room_id)
+      .populate('master')
+      .populate('players')
+      .exec();
+  }
+
+  // Add a user to a room
+  async addUserToRoom(
+    room_id: string,
+    user: UserDocument,
+  ): Promise<RoomDocument> {
+    // Get the room
+    const room = await this.getRoomById(room_id);
+
+    // Check if the user is already in the room
+    if (room.players.includes(user)) {
+      return room;
+    }
+    // Add the user to the room
+    room.players.push(new mongoose.Types.ObjectId(user._id) as any);
+    // Add the user to the score record
+    room.scores[String(user._id)] = 0;
+    // Save the room
+    return room.save();
   }
 }
