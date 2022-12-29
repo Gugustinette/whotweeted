@@ -6,6 +6,9 @@ import { User } from './user.store'
 // Socket.io
 import { io } from 'socket.io-client'
 
+// Axios
+import axios from 'axios'
+
 // Store
 export const useRoom = defineStore('room', {
     state: () => ({
@@ -17,9 +20,23 @@ export const useRoom = defineStore('room', {
         players: null as User[] | null
     }),
     actions: {
-        // Set the master of the room
-        setMaster(master: User) {
-            this.master = master
+        // Create a room
+        createRoom(username: string) {
+            // Create a room
+            axios.post('/room/create', {
+                username: username
+            }).then((response) => {
+                console.log(response.data)
+                // Join the room
+                this.joinRoom(response.data.room_id, response.data.user._id)
+            })
+        },
+        // Join a room
+        joinRoom(room_id: string, user_id: string) {
+            this.socket.emit('join_room', {
+                room_id: room_id,
+                user_id: user_id
+            })
         }
     },
 })

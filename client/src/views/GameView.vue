@@ -9,14 +9,23 @@ const user = useUser();
 // Get Room Store
 const room = useRoom();
 
-// Log User Store
-console.log(user);
-// Log Room Store
-console.log(room);
+// When connected
+room.socket.on('connect', () => {
+  console.log('Connected to server');
+});
+
+// When receiving information about the room, log it
+room.socket.on('room_info', (data) => {
+  console.log(data);
+});
+
+// Launch websocket connection
+room.socket.connect();
 </script>
 
 <template>
   <div>
     Game View
+    <button @click="room.createRoom('Gugustinette')">Join room</button>
   </div>
 </template>

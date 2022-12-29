@@ -26,7 +26,7 @@ export class RoomService {
   createDefaultRoom(user: UserDocument): Promise<RoomDocument> {
     const createdRoom = new this.roomModel({
       master: user,
-      players: [user],
+      players: [],
       // Score is a record of the score of each player
       scores: {
         [String(user._id)]: 0,
