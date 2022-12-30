@@ -27,5 +27,6 @@ room.socket.connect();
   <div>
     Game View
     <button @click="room.createRoom('Gugustinette')">Join room</button>
+    <p>Actual room id (in url) : {{ $route.params.roomId }}</p>
   </div>
 </template>

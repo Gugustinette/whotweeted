@@ -1,6 +1,13 @@
+/**
+ * Vue configuration
+ */
 import { createApp } from 'vue'
+// Pinia
 import { createPinia } from 'pinia'
+// Axios
 import axios from "axios";
+// Router
+import router from "./router/router";
 
 /**
  * Axios configuration
@@ -23,11 +30,15 @@ axios.defaults.headers.common = {
     });
   });
 
+// Import style and app
 import './style.css'
 import App from './App.vue'
 
+// Create pinia and app
 const pinia = createPinia()
 const app = createApp(App)
 
+// Configure app
+app.use(router)
 app.use(pinia)
 app.mount('#app')
