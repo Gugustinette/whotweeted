@@ -44,6 +44,25 @@ export class RoomController {
   }
 
   /**
+   * Create a user (so other players can join the room)
+   * @returns {username} - The user's username
+   */
+  @Post('create-user')
+  async createUser(@Request() req): Promise<any> {
+    // Get user's username from request
+    const username = req.body.username;
+    // Create a new user
+    const user = await this.userService.createDefaultUser(username);
+
+    // Return the user information
+    return {
+      _id: user._id,
+      username: user.username,
+      url_pp: user.url_pp,
+    };
+  }
+
+  /**
    * Test Route
    */
   @Post('test')

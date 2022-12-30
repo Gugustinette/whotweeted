@@ -62,6 +62,21 @@ describe('Rooms', () => {
     });
   });
 
+  // Test the creation of a user
+  it(`/POST create user`, () => {
+    const response = request(app.getHttpServer())
+      .post('/room/create-user')
+      .send({ username: 'test' })
+      .expect(201);
+
+    return response.then((res) => {
+      // Check if the response has the correct properties
+      expect(res.body).toHaveProperty('_id');
+      expect(res.body).toHaveProperty('username');
+      expect(res.body).toHaveProperty('url_pp');
+    });
+  });
+
   // Test the join of a room via WebSockets
   it(`/WS join room`, (done) => {
     const response = request(app.getHttpServer())
@@ -87,6 +102,7 @@ describe('Rooms', () => {
 
       // Receive the list of players in the room
       socket.on(RoomGateway.EVENT_ROOM_INFO, (data) => {
+        console.log(data);
         // Check if the response has the correct properties
         expect(data).toHaveProperty('_id');
         expect(data).toHaveProperty('master');
@@ -95,7 +111,7 @@ describe('Rooms', () => {
         expect(data.master).toHaveProperty('url_pp');
         expect(data.master).toHaveProperty('nb_won_game');
         expect(data).toHaveProperty('players');
-        expect(data.players).toHaveLength(1);
+        expect(data.players).toHaveLength(0);
         expect(data).toHaveProperty('scores');
         expect(data).toHaveProperty('mode');
         expect(data.mode).toEqual('custom');
