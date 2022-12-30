@@ -3,6 +3,9 @@ import mongoose from 'mongoose';
 
 export type RoundDocument = mongoose.HydratedDocument<Round>;
 
+// Import the Tweet model
+import { Tweet } from './tweet.schema';
+
 // Represent a round
 @Schema()
 export class Round {
@@ -12,6 +15,12 @@ export class Round {
   // Tweet's id of the round
   @Prop()
   id_tweet: string;
+
+  // Tweet's of the round
+  @Prop({
+    type: mongoose.Schema.Types.Mixed,
+  })
+  tweet: Tweet;
 
   // Tweet's user's id of the round
   id_twitter_user_response: string;

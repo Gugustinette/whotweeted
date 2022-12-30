@@ -1,8 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
 
-import { User } from './user.schema';
-import { Round } from './round.schema';
+import { User, UserDocument } from './user.schema';
+import { Round, RoundDocument } from './round.schema';
 
 export type RoomDocument = mongoose.HydratedDocument<Room>;
 
@@ -14,7 +14,7 @@ export class Room {
    */
   // User's id who created the room
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
-  master: User;
+  master: UserDocument;
 
   // Users who play in the room
   @Prop({ type: mongoose.Schema.Types.Array, ref: 'User' })
@@ -28,7 +28,7 @@ export class Room {
 
   // Round in progress
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Round' })
-  actual_round: Round;
+  actual_round: RoundDocument;
 
   // Rounds of the game
   @Prop({ type: mongoose.Schema.Types.Array, ref: 'Round' })

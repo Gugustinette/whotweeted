@@ -10,6 +10,8 @@ import { Server, Socket } from 'socket.io';
 import { RoomService } from './room.service';
 // User Service
 import { UserService } from '../users/user.service';
+// Round Service
+import { RoundService } from '../rounds/round.service';
 
 @WebSocketGateway({
   cors: {
@@ -29,22 +31,28 @@ export class RoomGateway {
   constructor(
     private readonly roomService: RoomService,
     private readonly userService: UserService,
+    private readonly roundService: RoundService,
   ) {}
 
   @WebSocketServer()
   server: Server;
 
-  // Events Constants
+  /**
+   * Event Constants
+   */
+  // Setup
   static readonly EVENT_JOIN_ROOM = 'join_room';
   static readonly EVENT_PLAYER_JOINED = 'player_joined';
   static readonly EVENT_ROOM_INFO = 'room_info';
+  // Game initialization
+  static readonly EVENT_START_GAME = 'start_game';
+  static readonly EVENT_GAME_STARTED = 'game_started';
+  static readonly EVENT_NEW_ROUND = 'new_round';
 
   /**
    * Let a user join a room
    * @param {string} room_id - The room ID
    * @param {string} user_id - The user's ID
-   * Return every players in the room
-   * @returns {User[]} - The list of players in the room
    */
   @SubscribeMessage('join_room')
   async joinRoom(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
@@ -75,5 +83,55 @@ export class RoomGateway {
     client.emit(RoomGateway.EVENT_ROOM_INFO, room);
     // Add the user to the room
     await this.roomService.addUserToRoom(room_id, user);
+  }
+
+  /**
+   * Let a user start a game
+   * @param {string} room_id - The room ID
+   * @param {string} user_id - The user's ID
+   */
+  @SubscribeMessage('start_game')
+  async startGame(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+    const room_id = data.room_id;
+    const user_id = data.user_id;
+
+    // Get the room
+    const room = await this.roomService.getRoomPopulatedById(room_id);
+    // Check if the user is the master
+    if (room.master._id != user_id) {
+      // If the user is not the master, return an error
+      client.emit('error', {
+        message: 'You are not the master',
+      });
+      return;
+    }
+
+    // Start the game
+    await this.roomService.launchGame(room_id);
+    // Get the room
+    const updatedRoom = await this.roomService.getRoomPopulatedById(room_id);
+    // Send the room information to the client
+    client.emit(RoomGateway.EVENT_GAME_STARTED, updatedRoom);
+
+    // Generate the rounds
+    const rounds = await this.roundService.generateRounds(
+      updatedRoom.id_twitter_users,
+      updatedRoom.nb_max_round,
+    );
+    // Associate the rounds to the room
+    updatedRoom.rounds = rounds;
+    updatedRoom.actual_round = rounds[0];
+    // Save the room
+    await updatedRoom.save();
+
+    // Send the first round to the players
+    this.server.to(room_id).emit(RoomGateway.EVENT_NEW_ROUND, {
+      round: {
+        _id: updatedRoom.actual_round._id,
+        tweet: {
+          text: updatedRoom.actual_round.tweet.text,
+        },
+      },
+    });
   }
 }
