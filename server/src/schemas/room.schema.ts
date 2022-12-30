@@ -1,8 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
 
-import { User, UserDocument } from './user.schema';
-import { Round, RoundDocument } from './round.schema';
+import { UserDocument } from './user.schema';
+import { RoundDocument } from './round.schema';
 
 export type RoomDocument = mongoose.HydratedDocument<Room>;
 

@@ -47,7 +47,7 @@ export class RoomController {
    * Test Route
    */
   @Post('test')
-  async testRoute(@Request() req): Promise<any> {
+  async testRoute(): Promise<any> {
     return this.roundService.generateRounds(
       ['2367567792', '1153045032087248898'],
       2,
