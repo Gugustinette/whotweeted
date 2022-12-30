@@ -63,4 +63,33 @@ export class RoundService {
     // Return rounds
     return rounds;
   }
+
+  /**
+   * Return the scores for a given round
+   * @param round Round to get the scores
+   */
+  getScores(round: RoundDocument): Record<string, number> {
+    // Get the id of the twitter user who wrote the tweet (the correct answer)
+    const id_twitter_user_response = round.id_twitter_user_response;
+
+    // Get the id of the users who responded (the players who answered)
+    const id_twitter_users_response = Object.keys(round.player_responses);
+
+    // Get the scores
+    const scores = {};
+    id_twitter_users_response.forEach((id_twitter_user) => {
+      // If the user has responded correctly
+      if (
+        round.player_responses[id_twitter_user] === id_twitter_user_response
+      ) {
+        scores[id_twitter_user] = 1;
+      }
+      // If the user has responded incorrectly
+      else {
+        scores[id_twitter_user] = 0;
+      }
+    });
+
+    return scores;
+  }
 }

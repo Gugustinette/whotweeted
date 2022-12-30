@@ -18,7 +18,7 @@ export class Room {
 
   // Users who play in the room
   @Prop({ type: mongoose.Schema.Types.Array, ref: 'User' })
-  players: User[];
+  players: UserDocument[];
 
   // Scores of each player
   @Prop({
@@ -32,7 +32,7 @@ export class Room {
 
   // Rounds of the game
   @Prop({ type: mongoose.Schema.Types.Array, ref: 'Round' })
-  rounds: Round[];
+  rounds: RoundDocument[];
 
   // Twitter's id of the users that will be used in the game
   @Prop()

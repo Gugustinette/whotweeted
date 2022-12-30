@@ -56,6 +56,8 @@ export class RoomService {
       .findById(room_id)
       .populate('master')
       .populate('players')
+      .populate('actual_round')
+      .populate('rounds')
       .exec();
   }
 
@@ -117,5 +119,53 @@ export class RoomService {
     room.id_twitter_users = id_twitter_users;
     // Save the room
     return room.save();
+  }
+
+  // Answer to a round
+  async answerRound(
+    room_id: string,
+    user: UserDocument,
+    answer: string,
+  ): Promise<RoomDocument> {
+    // Get the room
+    const room = await this.getRoomPopulatedById(room_id);
+
+    // Get the actual round
+    const actual_round = room.actual_round;
+    // Check if the user has already answered
+    if (actual_round.player_responses[String(user._id)]) {
+      return room;
+    }
+
+    // Add the answer to the actual round
+    actual_round.player_responses[String(user._id)] = answer;
+    // Save the actual round
+    await actual_round.save();
+
+    // If all the players have answered
+    if (
+      Object.keys(actual_round.player_responses).length === room.players.length
+    ) {
+      // Get the score of the round
+      const score = await this.roundService.getScores(actual_round);
+      // Add the scores to the room
+      for (const player_id in score) {
+        room.scores[player_id] += score[player_id];
+      }
+      // Get the next round
+      room.actual_round = room.rounds[room.rounds.indexOf(actual_round) + 1];
+      // If there is no next round
+      if (!room.actual_round) {
+        // Set the status to "finished"
+        room.status = 'finished';
+        // Set the actual round to null
+        room.actual_round = null;
+      }
+      // Save the room
+      await room.save();
+    }
+
+    // Return the room
+    return room;
   }
 }

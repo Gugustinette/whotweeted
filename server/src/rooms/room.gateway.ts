@@ -48,6 +48,10 @@ export class RoomGateway {
   static readonly EVENT_START_GAME = 'start_game';
   static readonly EVENT_GAME_STARTED = 'game_started';
   static readonly EVENT_NEW_ROUND = 'new_round';
+  // Game
+  static readonly EVENT_ANSWER_ROUND = 'answer_round';
+  static readonly EVENT_ROUND_ENDED = 'round_ended';
+  static readonly EVENT_GAME_ENDED = 'game_ended';
 
   /**
    * Let a user join a room
@@ -133,5 +137,66 @@ export class RoomGateway {
         },
       },
     });
+  }
+
+  /**
+   * Let a user answer a round
+   * @param {string} room_id - The room ID
+   * @param {string} user_id - The user's ID
+   * @param {string} answer - The answer
+   */
+  @SubscribeMessage('answer_round')
+  async answerRound(
+    @MessageBody() data: any,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const room_id = data.room_id;
+    const user_id = data.user_id;
+    const answer = data.answer;
+
+    // Get the room
+    const room = await this.roomService.getRoomPopulatedById(room_id);
+    // Check if the user is in the room
+    if (!room.players.find((user) => user._id == user_id)) {
+      // If the user is not in the room, return an error
+      client.emit('error', {
+        message: 'You are not in the room',
+      });
+      return;
+    }
+
+    // Check if the user already answered the round
+    if (room.actual_round.player_responses[user_id]) {
+      // If the user already answered the round, return an error
+      client.emit('error', {
+        message: 'You already answered the round',
+      });
+      return;
+    }
+
+    // Answer the round
+    const updatedRoom = await this.roomService.answerRound(
+      room_id,
+      user_id,
+      answer,
+    );
+
+    // Check if the round is finished
+    if (updatedRoom.actual_round == null) {
+      // If the round is finished, send the round ended event
+      this.server.to(room_id).emit(RoomGateway.EVENT_ROUND_ENDED, {
+        room: updatedRoom,
+      });
+      return;
+    }
+
+    // Check if the game is finished
+    if (updatedRoom.status == 'finished') {
+      // If the game is finished, send the game ended event
+      this.server.to(room_id).emit(RoomGateway.EVENT_GAME_ENDED, {
+        room: updatedRoom,
+      });
+      return;
+    }
   }
 }
