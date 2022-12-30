@@ -37,7 +37,22 @@ export const useRoom = defineStore('room', {
                 room_id: room_id,
                 user_id: user_id
             })
-        }
+        },
+        // Start the game
+        startGame(room_id: string, user_id: string) {
+            this.socket.emit('start_game', {
+                room_id: room_id,
+                user_id: user_id
+            })
+        },
+        // Answer a round
+        answerRound(room_id: string, user_id: string, answer: string) {
+            this.socket.emit('answer_round', {
+                room_id: room_id,
+                user_id: user_id,
+                answer: answer
+            })
+        },
     },
 })
 
