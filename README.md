@@ -35,3 +35,17 @@ To stop the containers, run `docker compose -f docker/dev/docker-compose.yml dow
     - In order to run the containers in the background, add `-d` to the command
 
 To stop the containers, run `docker compose -f docker/prod/docker-compose.yml down` in the root directory
+
+#### Deployment
+
+The first time you deploy the application, you need to run the `ressources/deployment/deploy:setup.sh` script
+
+Requirements:
+- [Nginx](https://www.nginx.com/) set up on the server
+
+1. Clone the repository
+2. Run the `ressources/deployment/deploy.sh` script
+
+To add support for HTTPS, use [certbot](https://certbot.eff.org/) as follows:
+1. Install certbot: `sudo apt install certbot`
+2. Run cert : `sudo certbot --nginx -d who-tweeted.fr -d www.who-tweeted.fr -d api.who-tweeted.fr`
