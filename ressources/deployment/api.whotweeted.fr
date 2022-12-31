@@ -11,18 +11,6 @@ server {
             proxy_cache_bypass $http_upgrade;
     }
 
-    listen 443 ssl;
-    listen [::]:443 ssl;
-}
-
-server {
-    if ($host = api.whotweeted.fr) {
-        return 301 https://$host$request_uri;
-    }
-
     listen 80;
     listen [::]:80;
-
-    server_name api.whotweeted.fr;
-    return 404;
 }
