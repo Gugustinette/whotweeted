@@ -75,8 +75,10 @@ export class RoomGateway {
 
     // Send a message to the room to notify that a player joined
     this.server.to(room_id).emit(RoomGateway.EVENT_PLAYER_JOINED, {
-      user_id,
+      user,
     });
+    // Add the user to the room
+    await this.roomService.addUserToRoom(room_id, user);
 
     // Add the user to the room socket
     client.join(room_id);
@@ -85,14 +87,14 @@ export class RoomGateway {
     const room = await this.roomService.getRoomPopulatedById(room_id);
     // Send the room information to the client
     client.emit(RoomGateway.EVENT_ROOM_INFO, room);
-    // Add the user to the room
-    await this.roomService.addUserToRoom(room_id, user);
   }
 
   /**
    * Let a user start a game
    * @param {string} room_id - The room ID
    * @param {string} user_id - The user's ID
+   * @param {number} id_twitter_users - The Twitter users ID
+   * @param {number} nb_max_round - The number of rounds
    */
   @SubscribeMessage('start_game')
   async startGame(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
@@ -111,22 +113,16 @@ export class RoomGateway {
     }
 
     // Start the game
-    await this.roomService.launchGame(room_id);
+    await this.roomService.launchGame(
+      room_id,
+      data.id_twitter_users,
+      data.nb_max_round,
+    );
     // Get the room
     const updatedRoom = await this.roomService.getRoomPopulatedById(room_id);
-    // Send the room information to the client
-    client.emit(RoomGateway.EVENT_GAME_STARTED, updatedRoom);
 
-    // Generate the rounds
-    const rounds = await this.roundService.generateRounds(
-      updatedRoom.id_twitter_users,
-      updatedRoom.nb_max_round,
-    );
-    // Associate the rounds to the room
-    updatedRoom.rounds = rounds;
-    updatedRoom.actual_round = rounds[0];
-    // Save the room
-    await updatedRoom.save();
+    // Send the room information to the players
+    this.server.to(room_id).emit(RoomGateway.EVENT_ROOM_INFO, updatedRoom);
 
     // Send the first round to the players
     this.server.to(room_id).emit(RoomGateway.EVENT_NEW_ROUND, {

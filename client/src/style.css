@@ -4,6 +4,7 @@
   --font-color: #fff;
   --background-color: #002933;
   --surface-color: #034252;
+  --surface-color-hover: #0a5c6f;
   --primary-color: #00CCFF;
 
   color-scheme: light dark;
@@ -30,4 +31,32 @@ body {
     --surface-color: #eee;
     --primary-color: #00CCFF;
   }
+}
+
+a {
+  color: var(--font-color);
+  text-decoration: none;
+}
+
+button {
+  font-family: 'Righteous', cursive;
+  color: var(--font-color);
+  background-color: var(--surface-color);
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+input {
+  padding: 10px 20px;
+  border-radius: 20px;
+  border: 1px solid var(--surface-color);
+  background: var(--surface-color);
+  transition: all 0.2s ease-in-out;
+}
+input:focus {
+  border: 1px solid var(--primary-color);
+  outline: none;
 }

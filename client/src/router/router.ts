@@ -19,6 +19,7 @@ export default createRouter({
             path: '/game/:roomId',
             name: 'GameView',
             component: GameView,
+            props: true,
         },
     ],
 });

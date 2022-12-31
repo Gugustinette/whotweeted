@@ -2,15 +2,15 @@ import { Controller, Get, Post, Request } from '@nestjs/common';
 import { RoomService } from './room.service';
 import { UserService } from '../users/user.service';
 
-// Round service
-import { RoundService } from '../rounds/round.service';
+// TwitterService
+import { TwitterService } from '../twitter/twitter.service';
 
 @Controller('room')
 export class RoomController {
   constructor(
     private readonly roomService: RoomService,
     private readonly userService: UserService,
-    private readonly roundService: RoundService,
+    private readonly twitterService: TwitterService,
   ) {}
 
   @Get()
@@ -63,13 +63,26 @@ export class RoomController {
   }
 
   /**
+   * Search a user by its username
+   * @param {string} username - The user's username
+   * @returns {User} - The user
+   */
+  @Get('search-user')
+  async searchUserByUsername(@Request() req): Promise<any> {
+    // Get user's username from request
+    const username = req.query.username;
+    // Search the user
+    const user = await this.twitterService.searchUserByUsername(username);
+
+    // Return the user information
+    return user;
+  }
+
+  /**
    * Test Route
    */
   @Post('test')
   async testRoute(): Promise<any> {
-    return this.roundService.generateRounds(
-      ['2367567792', '1153045032087248898'],
-      2,
-    );
+    return this.twitterService.searchUserByUsername('realDonaldTrump');
   }
 }

@@ -82,22 +82,23 @@ export class RoomService {
   }
 
   // Launch the game
-  async launchGame(room_id: string): Promise<RoomDocument> {
+  async launchGame(
+    room_id: string,
+    id_twitter_users: string[],
+    nb_max_round: number,
+  ): Promise<RoomDocument> {
     // Get the room
     const room = await this.getRoomById(room_id);
     // Set the status to "playing"
     room.status = 'playing';
-    // Generate rounds
-    /*
+    // Generate the rounds
     const rounds = await this.roundService.generateRounds(
-      room.id_twitter_users,
-      room.nb_max_round,
+      id_twitter_users,
+      nb_max_round,
     );
-    // Set the rounds
+    // Associate the rounds to the room
     room.rounds = rounds;
-    // Set the actual round
     room.actual_round = rounds[0];
-    */
     // Save the room
     return room.save();
   }

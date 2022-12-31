@@ -13,22 +13,24 @@ import axios from 'axios'
 export const useRoom = defineStore('room', {
     state: () => ({
         // Socket.io
-        socket: io('ws://localhost:9001'),
-        // Master of the room
-        master: null as User | null,
-        // Players in the room
-        players: null as User[] | null
+        socket: io('ws://localhost:9001', {
+            autoConnect: false
+        }),
+        // Room
+        room: null as Room | null,
     }),
     actions: {
         // Create a room
-        createRoom(username: string) {
+        createRoom(username: string): Promise<any> {
             // Create a room
-            axios.post('/room/create', {
-                username: username
-            }).then((response) => {
-                console.log(response.data)
-                // Join the room
-                this.joinRoom(response.data.room_id, response.data.user._id)
+            return new Promise((resolve, reject) => {
+                axios.post('/room/create', {
+                    username: username
+                }).then((response) => {
+                    resolve(response.data)
+                }).catch((error) => {
+                    reject(error)
+                })
             })
         },
         // Join a room

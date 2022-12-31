@@ -25,6 +25,19 @@ export const useUser = defineStore('user', {
                 url_pp: user.url_pp,
                 nb_won_game: 0,
             };
+        },
+        async searchUserByUsername(username: string): Promise<any> {
+            // Search a user by its username
+            const user = await axios.get('/room/search-user', {
+                params: {
+                    username: username
+                }
+            }).then((response) => {
+                return response.data
+            })
+
+            // Return the user information
+            return user;
         }
     }
 })

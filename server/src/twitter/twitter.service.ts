@@ -84,4 +84,23 @@ export class TwitterService {
     // Return the list of tweets
     return tweets;
   }
+
+  /**
+   * Search a user by its username
+   * @param username Username of the user to search
+   */
+  async searchUserByUsername(username: string) {
+    // Search the user
+    const user = await axios.get(
+      `${this.BASE_URL}/users/by/username/${username}?user.fields=profile_image_url`,
+      {
+        headers: {
+          Authorization: `Bearer ${this.TWITTER_BEARER_TOKEN}`,
+        },
+      },
+    );
+
+    // Return the user
+    return user.data;
+  }
 }
