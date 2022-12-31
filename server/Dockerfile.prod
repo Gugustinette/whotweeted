@@ -1,0 +1,21 @@
+# Dockerfile for deploying NestJS on a server
+FROM node:latest
+
+# Create app directory
+WORKDIR /app
+
+# Install app dependencies
+COPY package.json ./
+RUN npm install
+
+# Bundle app source
+COPY . .
+
+# Expose port 5174
+EXPOSE 5174
+
+# Build the app
+RUN npm run build
+
+# Run the app
+CMD [ "node", "dist/main.js" ]

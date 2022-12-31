@@ -1,3 +1,4 @@
+# Dockerfile for production deployment
 version: '3'
 
 services:
@@ -5,16 +6,15 @@ services:
   #Front-end service
   whotweeted-front:
     build:
-      context: ./client
-      dockerfile: Dockerfile
+      context: ../../client
+      dockerfile: Dockerfile.prod
     ports:
       - "9000:5173"
-      - "9002:9002"
     env_file:
-      - ./client/.env
+      - ../../client/.env
     volumes:
-      - ./client/src:/app/src
-      - ./client/public:/app/public
+      - ../../client/src:/app/src
+      - ../../client/public:/app/public
     container_name: whotweeted-front
     depends_on:
       - whotweeted-back
@@ -22,15 +22,15 @@ services:
   #Back-end service
   whotweeted-back:
     build:
-      context: ./server
-      dockerfile: Dockerfile
+      context: ../../server
+      dockerfile: Dockerfile.prod
     ports:
       - "9001:5174"
     env_file:
-      - ./server/.env
+      - ../../server/.env
     volumes:
-      - ./server/src:/app/src
-      - ./server/test:/app/test
+      - ../../server/src:/app/src
+      - ../../server/test:/app/test
     container_name: whotweeted-back
     depends_on:
       - whotweeted-db
@@ -44,4 +44,4 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - ./database/db:/data/db
+      - ../../database/db:/data/db

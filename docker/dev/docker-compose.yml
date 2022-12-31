@@ -1,0 +1,48 @@
+# Dockerfile for development
+version: '3'
+
+services:
+
+  #Front-end service
+  whotweeted-front:
+    build:
+      context: ../../client
+      dockerfile: Dockerfile.dev
+    ports:
+      - "9000:5173"
+      - "9002:9002"
+    env_file:
+      - ../../client/.env
+    volumes:
+      - ../../client/src:/app/src
+      - ../../client/public:/app/public
+    container_name: whotweeted-front
+    depends_on:
+      - whotweeted-back
+
+  #Back-end service
+  whotweeted-back:
+    build:
+      context: ../../server
+      dockerfile: Dockerfile.dev
+    ports:
+      - "9001:5174"
+    env_file:
+      - ../../server/.env
+    volumes:
+      - ../../server/src:/app/src
+      - ../../server/test:/app/test
+    container_name: whotweeted-back
+    depends_on:
+      - whotweeted-db
+    links:
+      - whotweeted-db:db
+
+  #Database Service
+  whotweeted-db:
+    image: mongo
+    container_name: whotweeted-db
+    ports:
+      - "27017:27017"
+    volumes:
+      - ../../database/db:/data/db

@@ -5,13 +5,13 @@
   "description": "An online game based on who tweeted a given tweet",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vue-tsc && vite build",
-    "preview": "vite preview"
+    "dev": "node ./node_modules/dotenv-cli/cli.js -e .env vite",
+    "build": "node ./node_modules/dotenv-cli/cli.js -e .env vue-tsc && vite build",
+    "preview": "node ./node_modules/dotenv-cli/cli.js -e .env vite preview"
   },
   "dependencies": {
     "axios": "^1.2.2",
-    "dotenv": "^16.0.3",
+    "dotenv-cli": "^6.0.0",
     "pinia": "^2.0.28",
     "socket.io-client": "^4.5.4",
     "vue": "^3.2.45",

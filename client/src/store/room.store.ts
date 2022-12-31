@@ -9,11 +9,17 @@ import { io } from 'socket.io-client'
 // Axios
 import axios from 'axios'
 
+const WEBSOCKET_URL = (
+    import.meta.env.DEV ?
+    import.meta.env.VITE_WEBSOCKET_BASE_URL_DEV :
+    import.meta.env.VITE_WEBSOCKET_BASE_URL_PROD
+  )
+
 // Store
 export const useRoom = defineStore('room', {
     state: () => ({
         // Socket.io
-        socket: io('ws://localhost:9001', {
+        socket: io(WEBSOCKET_URL, {
             autoConnect: false
         }),
         // Room
