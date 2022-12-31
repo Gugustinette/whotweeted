@@ -48,4 +48,13 @@ Requirements:
 
 To add support for HTTPS, use [certbot](https://certbot.eff.org/) as follows:
 1. Install certbot: `sudo apt install certbot`
-2. Run cert : `sudo certbot --nginx -d who-tweeted.fr -d www.who-tweeted.fr -d api.who-tweeted.fr`
+2. Run cert : `sudo certbot --nginx -d whotweeted.fr -d www.whotweeted.fr -d api.whotweeted.fr`
+
+You also need to copy the '.env.example' file in the server folder and create a '.env' file with the following content (Twitter API keys are required):
+```
+TWITTER_APP_NAME=
+TWITTER_APP_ID=
+TWITTER_API_KEY=
+TWITTER_API_KEY_SECRET=
+TWITTER_BEARER_TOKEN=
+```
