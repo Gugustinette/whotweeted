@@ -41,10 +41,12 @@ export const useRoom = defineStore('room', {
             })
         },
         // Start the game
-        startGame(room_id: string, user_id: string) {
+        startGame(room_id: string, user_id: string, id_twitter_users: string[]) {
             this.socket.emit('start_game', {
                 room_id: room_id,
-                user_id: user_id
+                user_id: user_id,
+                id_twitter_users: id_twitter_users,
+                nb_max_round: 5,
             })
         },
         // Answer a round
@@ -55,6 +57,13 @@ export const useRoom = defineStore('room', {
                 answer: answer
             })
         },
+        // Next Round
+        nextRound(room_id: string, user_id: string) {
+            this.socket.emit('next_round', {
+                room_id: room_id,
+                user_id: user_id
+            })
+        }
     },
 })
 
@@ -73,8 +82,10 @@ export interface Room {
 }
 export interface Round {
     id_tweet: string
+    tweet: any
     id_twitter_user_response: string
     id_twitter_user_propositions: string[]
+    twitter_users_profiles: Record<string, any>
     player_responses: Record<string, string>
 }
 

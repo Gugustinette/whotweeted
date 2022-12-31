@@ -18,13 +18,15 @@ export const useUser = defineStore('user', {
                 return response.data
             })
 
-            // Return the user information
-            return {
+            const userData = {
                 _id: user._id,
                 username: user.username,
                 url_pp: user.url_pp,
                 nb_won_game: 0,
             };
+
+            // Return the user information
+            return userData;
         },
         async searchUserByUsername(username: string): Promise<any> {
             // Search a user by its username

@@ -50,6 +50,7 @@ export class Room {
    * Configuration
    */
   // Number of rounds in the game
+  @Prop()
   nb_max_round: number;
 }
 

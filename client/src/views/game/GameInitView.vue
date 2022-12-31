@@ -91,7 +91,7 @@ const removeTwitterAccount = (account: any) => {
         <PlayerProfil v-for="player in room.players" :key="player._id" :user="player" />
       </div>
     </div>
-    <div class="game-config">
+    <div class="game-config" v-if="roomStore.room?.master._id === userStore.user?._id">
       <h3>Game Configuration</h3>
       <!-- Let the user choose twitter accounts by querying the server -->
       <div class="twitter-accounts">

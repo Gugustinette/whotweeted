@@ -6,6 +6,7 @@
   --surface-color: #034252;
   --surface-color-hover: #0a5c6f;
   --primary-color: #00CCFF;
+  --on-primary-color: var(--surface-color);
 
   color-scheme: light dark;
 

@@ -131,6 +131,9 @@ export class RoomGateway {
         tweet: {
           text: updatedRoom.actual_round.tweet.text,
         },
+        id_twitter_user_propositions:
+          updatedRoom.actual_round.id_twitter_user_propositions,
+        twitter_users_profiles: updatedRoom.actual_round.twitter_users_profiles,
       },
     });
   }
@@ -178,11 +181,14 @@ export class RoomGateway {
     );
 
     // Check if the round is finished
-    if (updatedRoom.actual_round == null) {
+    if (updatedRoom.status == 'next_round') {
       // If the round is finished, send the round ended event
       this.server.to(room_id).emit(RoomGateway.EVENT_ROUND_ENDED, {
         room: updatedRoom,
       });
+      updatedRoom.status = 'playing';
+      // Save the room
+      await updatedRoom.save();
       return;
     }
 
@@ -192,7 +198,43 @@ export class RoomGateway {
       this.server.to(room_id).emit(RoomGateway.EVENT_GAME_ENDED, {
         room: updatedRoom,
       });
+      this.roomService.deleteRoom(room_id);
       return;
     }
+  }
+
+  /**
+   * Let a user play the next round
+   * @param {string} room_id - The room ID
+   * @param {string} user_id - The user's ID
+   */
+  @SubscribeMessage('next_round')
+  async nextRound(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+    const room_id = data.room_id;
+    const user_id = data.user_id;
+
+    // Get the room
+    const room = await this.roomService.getRoomPopulatedById(room_id);
+    // Check if the user is the master
+    if (room.master._id != user_id) {
+      // If the user is not the master, return an error
+      client.emit('error', {
+        message: 'You are not the master',
+      });
+      return;
+    }
+
+    // Send the next round to the players
+    this.server.to(room_id).emit(RoomGateway.EVENT_NEW_ROUND, {
+      round: {
+        _id: room.actual_round._id,
+        tweet: {
+          text: room.actual_round.tweet.text,
+        },
+        id_twitter_user_propositions:
+          room.actual_round.id_twitter_user_propositions,
+        twitter_users_profiles: room.actual_round.twitter_users_profiles,
+      },
+    });
   }
 }

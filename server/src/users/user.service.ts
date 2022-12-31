@@ -35,4 +35,9 @@ export class UserService {
   async getUserById(user_id: string): Promise<UserDocument> {
     return this.userModel.findById(user_id).exec();
   }
+
+  // Delete a user by its ID
+  async deleteUserById(user_id: string): Promise<UserDocument> {
+    return this.userModel.findByIdAndDelete(user_id).exec();
+  }
 }

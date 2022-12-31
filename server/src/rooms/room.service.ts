@@ -9,6 +9,8 @@ import { UserDocument } from '../schemas/user.schema';
 
 // Round service
 import { RoundService } from '../rounds/round.service';
+// User service
+import { UserService } from '../users/user.service';
 
 @Injectable()
 export class RoomService {
@@ -16,6 +18,7 @@ export class RoomService {
   constructor(
     @InjectModel(Room.name) private roomModel: Model<RoomDocument>,
     private roundService: RoundService,
+    private userService: UserService,
   ) {}
 
   getHello(): string {
@@ -35,7 +38,7 @@ export class RoomService {
       players: [],
       // Score is a record of the score of each player
       scores: {
-        [String(user._id)]: 0,
+        '': 0,
       },
       actual_round: null,
       rounds: [],
@@ -76,7 +79,10 @@ export class RoomService {
     // Add the user to the room
     room.players.push(new mongoose.Types.ObjectId(user._id) as any);
     // Add the user to the score record
-    room.scores[String(user._id)] = 0;
+    room.scores = {
+      ...room.scores,
+      [String(user._id)]: 0,
+    };
     // Save the room
     return room.save();
   }
@@ -97,8 +103,12 @@ export class RoomService {
       nb_max_round,
     );
     // Associate the rounds to the room
-    room.rounds = rounds;
+    room.rounds = [
+      ...room.rounds,
+      ...rounds.map((round) => new mongoose.Types.ObjectId(round._id) as any),
+    ];
     room.actual_round = rounds[0];
+    room.id_twitter_users = id_twitter_users;
     // Save the room
     return room.save();
   }
@@ -125,36 +135,54 @@ export class RoomService {
   // Answer to a round
   async answerRound(
     room_id: string,
-    user: UserDocument,
+    user_id: string,
     answer: string,
   ): Promise<RoomDocument> {
     // Get the room
     const room = await this.getRoomPopulatedById(room_id);
 
     // Get the actual round
-    const actual_round = room.actual_round;
+    const actual_round = await this.roundService.getRoundById(
+      String(room.actual_round._id),
+    );
     // Check if the user has already answered
-    if (actual_round.player_responses[String(user._id)]) {
+    if (actual_round.player_responses[user_id]) {
       return room;
     }
 
     // Add the answer to the actual round
-    actual_round.player_responses[String(user._id)] = answer;
+    actual_round.player_responses = {
+      ...actual_round.player_responses,
+      [user_id]: answer,
+    };
     // Save the actual round
     await actual_round.save();
 
     // If all the players have answered
     if (
-      Object.keys(actual_round.player_responses).length === room.players.length
+      Object.keys(actual_round.player_responses).length - 1 ===
+      room.players.length
     ) {
       // Get the score of the round
       const score = await this.roundService.getScores(actual_round);
+
       // Add the scores to the room
-      for (const player_id in score) {
-        room.scores[player_id] += score[player_id];
-      }
+      Object.keys(score).forEach((user_id) => {
+        room.scores = {
+          ...room.scores,
+          [user_id]: room.scores[user_id] + score[user_id],
+        };
+      });
+      room.status = 'next_round';
+
       // Get the next round
-      room.actual_round = room.rounds[room.rounds.indexOf(actual_round) + 1];
+      room.actual_round =
+        room.rounds[
+          room.rounds.findIndex((round) => {
+            return String(round._id) === String(room.actual_round._id);
+          }) + 1
+        ];
+
       // If there is no next round
       if (!room.actual_round) {
         // Set the status to "finished"
@@ -162,11 +190,31 @@ export class RoomService {
         // Set the actual round to null
         room.actual_round = null;
       }
-      // Save the room
-      await room.save();
     }
 
     // Return the room
-    return room;
+    return room.save();
+  }
+
+  // Delete every data of a room
+  async deleteRoom(room_id: string): Promise<RoomDocument> {
+    // Get the room
+    const room = await this.getRoomPopulatedById(room_id);
+    // For each round
+    await Promise.all(
+      room.rounds.map(async (round) => {
+        // Delete the round
+        await this.roundService.deleteRoundById(String(round._id));
+      }),
+    );
+    // For each player
+    await Promise.all(
+      room.players.map(async (player) => {
+        // Delete the player
+        await this.userService.deleteUserById(String(player._id));
+      }),
+    );
+    // Delete the room
+    return room.remove();
   }
 }

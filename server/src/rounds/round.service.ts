@@ -21,14 +21,19 @@ export class RoundService {
   }
 
   // Create a new Round
-  createRound(Round: Round): Promise<RoundDocument> {
-    const createdRound = new this.roundModel(Round);
+  createRound(round: Round): Promise<RoundDocument> {
+    const createdRound = new this.roundModel(round);
     return createdRound.save();
   }
 
   // Get a Round by its ID
-  getRoundById(Round_id: string): Promise<RoundDocument> {
-    return this.roundModel.findById(Round_id).exec();
+  getRoundById(round_id: string): Promise<RoundDocument> {
+    return this.roundModel.findById(round_id).exec();
+  }
+
+  // Delete a Round by its ID
+  deleteRoundById(round_id: string): Promise<RoundDocument> {
+    return this.roundModel.findByIdAndDelete(round_id).exec();
   }
 
   /**
@@ -46,6 +51,16 @@ export class RoundService {
       nb_rounds,
     );
 
+    // Get twitter users profiles
+    const twitter_users_profiles = {};
+
+    for (let i = 0; i < id_twitter_users.length; i++) {
+      const twitter_user_profile = await this.twitterService.getUserProfile(
+        id_twitter_users[i],
+      );
+      twitter_users_profiles[id_twitter_users[i]] = twitter_user_profile;
+    }
+
     // Create rounds
     const rounds = [];
 
@@ -55,7 +70,10 @@ export class RoundService {
         tweet: tweets[i],
         id_twitter_user_response: tweets[i].author_id,
         id_twitter_user_propositions: id_twitter_users,
-        player_responses: {},
+        player_responses: {
+          [tweets[i].author_id]: tweets[i].author_id,
+        },
+        twitter_users_profiles: twitter_users_profiles,
       });
       rounds.push(round);
     }

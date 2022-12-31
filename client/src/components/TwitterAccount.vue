@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineProps, defineEmits, ref } from 'vue';
+import { defineProps, defineEmits, ref, onUpdated } from 'vue';
 
 // Emit
 const emit = defineEmits(['toggleTwitterAccount', 'removeTwitterAccount'])
@@ -23,6 +23,11 @@ const addTwitterAccount = () => {
   // Toggle selected
   selected.value = !selected.value;
 };
+
+// When updated, reset the selected value
+onUpdated(() => {
+  selected.value = false;
+});
 </script>
 
 <template>

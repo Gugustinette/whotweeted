@@ -103,4 +103,23 @@ export class TwitterService {
     // Return the user
     return user.data;
   }
+
+  /**
+   * Get a user profile by its id
+   * @param id_twitter_user Id of the user to get
+   */
+  async getUserProfile(id_twitter_user: string) {
+    // Get the user profile
+    const userProfile = await axios.get(
+      `${this.BASE_URL}/users/${id_twitter_user}?user.fields=profile_image_url`,
+      {
+        headers: {
+          Authorization: `Bearer ${this.TWITTER_BEARER_TOKEN}`,
+        },
+      },
+    );
+
+    // Return the user profile
+    return userProfile.data.data;
+  }
 }

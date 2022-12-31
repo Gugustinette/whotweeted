@@ -23,10 +23,18 @@ export class Round {
   tweet: Tweet;
 
   // Tweet's user's id of the round
+  @Prop()
   id_twitter_user_response: string;
 
   // Tweet's user's ids to propose to the players
+  @Prop()
   id_twitter_user_propositions: string[];
+
+  // Record to store twitter users' profiles
+  @Prop({
+    type: mongoose.Schema.Types.Mixed,
+  })
+  twitter_users_profiles: Record<string, any>;
 
   // Player's responses (id_user => id_twitter_user)
   @Prop({
