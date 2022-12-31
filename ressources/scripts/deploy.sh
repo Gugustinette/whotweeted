@@ -12,6 +12,3 @@ sudo nginx -t
 
 # Restart Nginx
 sudo systemctl restart nginx
-
-# Launch the app
-docker compose -f docker/prod/docker-compose.yml up -d --build
